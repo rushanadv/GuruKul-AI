@@ -1,0 +1,400 @@
+export interface ConstellationNode {
+  id: string;
+  label: string;
+  sublabel: string;
+  category: "foundations" | "neural" | "architectures" | "attention" | "frontier";
+  x: number;
+  y: number;
+  radius: number;
+  importance: 1 | 2 | 3;
+  order: number; // For progressive mastery reveal
+  citation: string;
+  summary: string;
+}
+
+export interface ConstellationEdge {
+  id: string;
+  source: string;
+  target: string;
+  weight?: number;
+  isPrereq?: boolean;
+}
+
+export const CONSTELLATION_NODES: ConstellationNode[] = [
+  // Foundations (left-bottom)
+  {
+    id: "n1",
+    label: "Vector Spaces & Matrices",
+    sublabel: "Week 1 • Math Foundations",
+    category: "foundations",
+    x: 120,
+    y: 460,
+    radius: 9,
+    importance: 2,
+    order: 1,
+    citation: "Syllabus §1.1 • Strang Ch. 3",
+    summary: "Orthogonal projections, spectral theorem, and matrix rank in high-dimensional representations.",
+  },
+  {
+    id: "n2",
+    label: "Multivariable Gradients",
+    sublabel: "Week 1 • Calculus",
+    category: "foundations",
+    x: 180,
+    y: 350,
+    radius: 8,
+    importance: 2,
+    order: 2,
+    citation: "Syllabus §1.3 • Boyd & Vandenberghe §2",
+    summary: "Jacobian matrices, directional derivatives, and Taylor approximations in parameter space.",
+  },
+  {
+    id: "n3",
+    label: "Maximum Likelihood & Bayes",
+    sublabel: "Week 2 • Probability",
+    category: "foundations",
+    x: 110,
+    y: 220,
+    radius: 7,
+    importance: 1,
+    order: 3,
+    citation: "Syllabus §2.1 • Bishop Ch. 1-2",
+    summary: "Log-likelihood objectives, posterior inference, and Kullback-Leibler divergence.",
+  },
+  {
+    id: "n4",
+    label: "Loss Landscapes & Convexity",
+    sublabel: "Week 2 • Optimization",
+    category: "foundations",
+    x: 260,
+    y: 420,
+    radius: 8,
+    importance: 2,
+    order: 4,
+    citation: "Syllabus §2.3 • Goodfellow Ch. 4",
+    summary: "Saddle point geometries, local minima dynamics, and Lipschitz smoothness bounds.",
+  },
+
+  // Neural Foundations (center-left)
+  {
+    id: "n5",
+    label: "Perceptron & Non-Linearities",
+    sublabel: "Week 3 • Early Neural",
+    category: "neural",
+    x: 310,
+    y: 290,
+    radius: 8,
+    importance: 2,
+    order: 5,
+    citation: "Syllabus §3.1 • Rosenblatt / Minsky",
+    summary: "Linear separability limits and universal approximation with smooth non-linear activation functions.",
+  },
+  {
+    id: "n6",
+    label: "Backpropagation Dynamics",
+    sublabel: "Week 4 • Core Mechanics",
+    category: "neural",
+    x: 390,
+    y: 390,
+    radius: 11,
+    importance: 3,
+    order: 6,
+    citation: "Syllabus §3.4 • Rumelhart et al., 1986",
+    summary: "Reverse-mode autodiff caching Jacobian products to evaluate parameter gradients in linear time.",
+  },
+  {
+    id: "n7",
+    label: "Adaptive Optimizers (Adam)",
+    sublabel: "Week 4 • First-Order Methods",
+    category: "neural",
+    x: 350,
+    y: 520,
+    radius: 7,
+    importance: 1,
+    order: 7,
+    citation: "Syllabus §4.1 • Kingma & Ba, 2014",
+    summary: "Exponentially moving first and second moment estimations for decoupled adaptive learning rates.",
+  },
+  {
+    id: "n8",
+    label: "Regularization & Dropout",
+    sublabel: "Week 5 • Generalization",
+    category: "neural",
+    x: 250,
+    y: 170,
+    radius: 7,
+    importance: 1,
+    order: 8,
+    citation: "Syllabus §4.4 • Srivastava et al., 2014",
+    summary: "Stochastic node dropping approximating exponential ensemble averaging over parameter subgraphs.",
+  },
+
+  // Architectures (center)
+  {
+    id: "n9",
+    label: "Spatial Convolutions",
+    sublabel: "Week 6 • Vision",
+    category: "architectures",
+    x: 460,
+    y: 180,
+    radius: 9,
+    importance: 2,
+    order: 9,
+    citation: "Syllabus §5.1 • LeCun et al., 1998",
+    summary: "Translational equivariance, weight sharing, and receptive field dilation across feature hierarchies.",
+  },
+  {
+    id: "n10",
+    label: "Recurrent Memory & LSTMs",
+    sublabel: "Week 7 • Sequences",
+    category: "architectures",
+    x: 490,
+    y: 470,
+    radius: 8,
+    importance: 2,
+    order: 10,
+    citation: "Syllabus §5.3 • Hochreiter & Schmidhuber",
+    summary: "Constant error carousels and gated memory cells preserving error gradients across temporal spans.",
+  },
+  {
+    id: "n11",
+    label: "Information Bottlenecks",
+    sublabel: "Week 7 • Autoencoding",
+    category: "architectures",
+    x: 430,
+    y: 300,
+    radius: 8,
+    importance: 1,
+    order: 11,
+    citation: "Syllabus §6.1 • Tishby & Zaslavsky",
+    summary: "Compression-distortion trade-offs and mutual information retention in low-dimensional latent spaces.",
+  },
+  {
+    id: "n12",
+    label: "Vanishing Gradient Dynamics",
+    sublabel: "Week 8 • Deep Stability",
+    category: "architectures",
+    x: 540,
+    y: 340,
+    radius: 9,
+    importance: 2,
+    order: 12,
+    citation: "Syllabus §6.4 • Bengio et al., 1994",
+    summary: "Exponential spectral decay through repeated matrix multiplication in deep computational graphs.",
+  },
+  {
+    id: "n13",
+    label: "Residual Skip Connections",
+    sublabel: "Week 8 • The ResNet Breakthrough",
+    category: "architectures",
+    x: 600,
+    y: 220,
+    radius: 12,
+    importance: 3,
+    order: 13,
+    citation: "Syllabus §7.2 • He et al., 2015",
+    summary: "Identity shortcut mapping F(x)+x providing clean highway gradient paths directly to early layers.",
+  },
+
+  // Attention & Modern Transformers (center-right)
+  {
+    id: "n14",
+    label: "Self-Attention Mechanism",
+    sublabel: "Week 9 • Attention Is All You Need",
+    category: "attention",
+    x: 680,
+    y: 380,
+    radius: 12,
+    importance: 3,
+    order: 14,
+    citation: "Syllabus §8.1 • Vaswani et al., 2017",
+    summary: "Softmax-scaled inner product matrix Softmax(QK^T / sqrt(d_k))V capturing global contextual dependencies.",
+  },
+  {
+    id: "n15",
+    label: "Positional Embeddings (RoPE)",
+    sublabel: "Week 9 • Sequence Geometry",
+    category: "attention",
+    x: 630,
+    y: 500,
+    radius: 8,
+    importance: 1,
+    order: 15,
+    citation: "Syllabus §8.3 • Su et al., 2021",
+    summary: "Rotary matrix multiplications encoding relative distance properties into complex query/key pairs.",
+  },
+  {
+    id: "n16",
+    label: "Multi-Head Projections",
+    sublabel: "Week 10 • Subspace Diversity",
+    category: "attention",
+    x: 740,
+    y: 250,
+    radius: 10,
+    importance: 2,
+    order: 16,
+    citation: "Syllabus §9.1 • Clark et al., 2019",
+    summary: "Parallel linear projection of tokens into disparate semantic and syntactic subspaces.",
+  },
+  {
+    id: "n17",
+    label: "LayerNorm & Pre-LN Stability",
+    sublabel: "Week 10 • Architecture Hygiene",
+    category: "attention",
+    x: 730,
+    y: 460,
+    radius: 7,
+    importance: 1,
+    order: 17,
+    citation: "Syllabus §9.3 • Ba, Kiros & Hinton",
+    summary: "Normalizing activations across hidden feature dimensions to preserve forward scale stability.",
+  },
+  {
+    id: "n18",
+    label: "Autoregressive Causal Masking",
+    sublabel: "Week 11 • Generative Pre-training",
+    category: "attention",
+    x: 820,
+    y: 340,
+    radius: 10,
+    importance: 2,
+    order: 18,
+    citation: "Syllabus §10.1 • Radford et al., 2018",
+    summary: "Triangular attention masking strictly prohibiting future token lookahead during left-to-right generation.",
+  },
+
+  // Frontier & Alignment (right)
+  {
+    id: "n19",
+    label: "Latent Diffusion & Score Matching",
+    sublabel: "Week 12 • Generative Models",
+    category: "frontier",
+    x: 840,
+    y: 170,
+    radius: 9,
+    importance: 2,
+    order: 19,
+    citation: "Syllabus §11.1 • Ho et al. / Rombach et al.",
+    summary: "Markovian forward Gaussian perturbation paired with learned score-based reverse vector field drift.",
+  },
+  {
+    id: "n20",
+    label: "Contrastive Multimodal (CLIP)",
+    sublabel: "Week 12 • Joint Embedding",
+    category: "frontier",
+    x: 910,
+    y: 270,
+    radius: 8,
+    importance: 2,
+    order: 20,
+    citation: "Syllabus §11.3 • Radford et al., 2021",
+    summary: "InfoNCE loss aligning disparate image and text representations onto a shared hypersphere.",
+  },
+  {
+    id: "n21",
+    label: "RLHF & Direct Preference (DPO)",
+    sublabel: "Week 13 • Alignment",
+    category: "frontier",
+    x: 890,
+    y: 430,
+    radius: 11,
+    importance: 3,
+    order: 21,
+    citation: "Syllabus §12.2 • Rafailov et al., 2023",
+    summary: "Implicit reward optimization directly derived from human preference pairs without training a standalone reward model.",
+  },
+  {
+    id: "n22",
+    label: "KV Caching & Inference Kernels",
+    sublabel: "Week 14 • Production Engineering",
+    category: "frontier",
+    x: 850,
+    y: 530,
+    radius: 7,
+    importance: 1,
+    order: 22,
+    citation: "Syllabus §13.1 • FlashAttention, Dao et al.",
+    summary: "SRAM tiling and persistent key-value caching eliminating quadratic decoding compute overhead.",
+  },
+];
+
+export const CONSTELLATION_EDGES: ConstellationEdge[] = [
+  // Foundations
+  { id: "e1", source: "n1", target: "n2", isPrereq: true },
+  { id: "e2", source: "n1", target: "n4", isPrereq: true },
+  { id: "e3", source: "n2", target: "n4", isPrereq: true },
+  { id: "e4", source: "n3", target: "n4" },
+  { id: "e5", source: "n2", target: "n5", isPrereq: true },
+  { id: "e6", source: "n4", target: "n6", isPrereq: true },
+  { id: "e7", source: "n5", target: "n6", isPrereq: true },
+  { id: "e8", source: "n6", target: "n7", isPrereq: true },
+  { id: "e9", source: "n5", target: "n8" },
+  { id: "e10", source: "n1", target: "n9" },
+  { id: "e11", source: "n6", target: "n9", isPrereq: true },
+  { id: "e12", source: "n6", target: "n10", isPrereq: true },
+  { id: "e13", source: "n5", target: "n11" },
+  { id: "e14", source: "n6", target: "n12", isPrereq: true },
+  { id: "e15", source: "n10", target: "n12" },
+  { id: "e16", source: "n12", target: "n13", isPrereq: true },
+  { id: "e17", source: "n9", target: "n13" },
+  { id: "e18", source: "n1", target: "n14", isPrereq: true },
+  { id: "e19", source: "n13", target: "n14", isPrereq: true },
+  { id: "e20", source: "n14", target: "n15" },
+  { id: "e21", source: "n14", target: "n16", isPrereq: true },
+  { id: "e22", source: "n13", target: "n17" },
+  { id: "e23", source: "n14", target: "n17" },
+  { id: "e24", source: "n16", target: "n18", isPrereq: true },
+  { id: "e25", source: "n17", target: "n18" },
+  { id: "e26", source: "n11", target: "n19" },
+  { id: "e27", source: "n16", target: "n20" },
+  { id: "e28", source: "n18", target: "n21", isPrereq: true },
+  { id: "e29", source: "n18", target: "n22" },
+  { id: "e30", source: "n15", target: "n22" },
+];
+
+export interface TraceQuery {
+  id: string;
+  title: string;
+  prompt: string;
+  targetNodeId: string;
+  path: string[]; // sequence of node ids
+  answer: string;
+  citation: string;
+  confidence: number;
+}
+
+export const TRACE_QUERIES: TraceQuery[] = [
+  {
+    id: "q1",
+    title: "Skip Connections & Gradients",
+    prompt: "Why do residual connections prevent vanishing gradients in deep networks?",
+    targetNodeId: "n13",
+    path: ["n1", "n4", "n6", "n12", "n13"],
+    answer:
+      "Residual connections introduce an identity shortcut y = F(x) + x. By the chain rule, dL/dx = (dL/dy)(dF/dx + 1). The constant +1 term provides a clean highway that guarantees gradient signals can propagate backwards without vanishing across arbitrary depths.",
+    citation: "Syllabus §7.2 • Lecture 9, Slide 14 • He et al., 2015 (ResNet)",
+    confidence: 99.4,
+  },
+  {
+    id: "q2",
+    title: "Self-Attention Prerequisite Trail",
+    prompt: "What mathematical foundations lead into Multi-Head Self-Attention?",
+    targetNodeId: "n16",
+    path: ["n1", "n5", "n13", "n14", "n16"],
+    answer:
+      "Multi-Head Attention depends directly on Vector Projections (Week 1) and Scaled Dot-Product Attention (Week 9). It maps Q, K, and V into h distinct parameter subspaces, allowing the model to jointly attend to information from different representation spaces at different positions.",
+    citation: "Syllabus §8.1 & §9.1 • Vaswani et al., 2017 • Reading Assignment 4",
+    confidence: 98.8,
+  },
+  {
+    id: "q3",
+    title: "Reverse-Mode Backprop Mechanics",
+    prompt: "How does backpropagation relate to the multivariable chain rule?",
+    targetNodeId: "n6",
+    path: ["n1", "n2", "n4", "n6"],
+    answer:
+      "Backpropagation is an exact implementation of reverse-mode automatic differentiation. By applying the multivariable chain rule backwards from the scalar loss, intermediate Jacobian products are dynamically cached, computing all parameter gradients in O(N) linear time.",
+    citation: "Syllabus §3.4 • Lecture 4, Slide 28 • Rumelhart & Hinton",
+    confidence: 99.7,
+  },
+];
