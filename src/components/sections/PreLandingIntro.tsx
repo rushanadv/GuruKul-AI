@@ -38,9 +38,9 @@ export const PreLandingIntro: React.FC = () => {
   const textOpacity = useTransform(smoothProgress, [0, 0.35, 0.6], [1.0, 1.0, 0.0]);
   const textScale = useTransform(smoothProgress, [0, 0.35, 0.6], [1.0, 1.0, 0.95]);
 
-  // --- Spatial Radial White Flash Expansion Overlay (0.60 -> 0.85) ---
-  const whiteFlashScale = useTransform(smoothProgress, [0.6, 0.85, 1.0], [0.1, 16.0, 16.0]);
-  const whiteFlashOpacity = useTransform(smoothProgress, [0.6, 0.85, 1.0], [0.0, 1.0, 1.0]);
+  // --- Spatial Radial White Flash Expansion Overlay (0.55 -> 0.95) ---
+  const whiteFlashScale = useTransform(smoothProgress, [0.55, 0.8, 0.96], [0.1, 14.0, 16.0]);
+  const whiteFlashOpacity = useTransform(smoothProgress, [0.55, 0.78, 0.88, 0.98], [0.0, 0.92, 0.7, 0.0]);
 
   // Active state props for shader
   const [shaderProps, setShaderProps] = useState({
@@ -114,23 +114,15 @@ export const PreLandingIntro: React.FC = () => {
           style={{
             opacity: whiteFlashOpacity,
           }}
-          className="absolute inset-0 z-40 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden bg-white/20"
+          className="absolute inset-0 z-40 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden"
         >
           <motion.div
             style={{
               scale: whiteFlashScale,
               background:
-                "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 25%, rgba(255,255,255,0) 70%)",
+                "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.92) 30%, rgba(53,245,180,0.4) 60%, transparent 80%)",
             }}
             className="w-[100vw] h-[100vh] rounded-full"
-          />
-
-          {/* SOLID WHITE COVER SHEET FOR 100% PURE WHITE FRAME AT END OF PRE-LANDING */}
-          <motion.div
-            style={{
-              opacity: useTransform(smoothProgress, [0.84, 0.88, 1.0], [0.0, 1.0, 1.0]),
-            }}
-            className="absolute inset-0 bg-white"
           />
         </motion.div>
       </div>

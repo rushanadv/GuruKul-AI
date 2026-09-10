@@ -47,9 +47,6 @@ export const HeroCinematicSequence: React.FC = () => {
   const phase5Opacity = useTransform(smoothProgress, [0.86, 0.94], [0, 1]);
   const phase5Y = useTransform(smoothProgress, [0.86, 0.94], [40, 0]);
 
-  // Entrance White Flash Overlay (dissolves from solid white to hero visual as user enters hero)
-  const introWhiteOpacity = useTransform(smoothProgress, [0, 0.06], [1, 0]);
-
   // Navigation bar fade during initial scroll
   const navOpacity = useTransform(smoothProgress, [0.05, 0.2], [1, 0.45]);
 
@@ -57,12 +54,6 @@ export const HeroCinematicSequence: React.FC = () => {
     <div ref={containerRef} className="relative w-full h-[400vh] bg-[#040605]">
       {/* Sticky Fullscreen Cinematic Viewport Container */}
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex items-center justify-center select-none">
-        {/* ENTRANCE WHITE FLASH OVERLAY — DISSOLVES FROM SOLID WHITE INTO KNOWLEDGE CONSTELLATION */}
-        <motion.div
-          style={{ opacity: introWhiteOpacity }}
-          className="absolute inset-0 z-50 bg-white pointer-events-none"
-        />
-
         {/* Ambient Top Glow Line */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#35F5B4]/25 to-transparent pointer-events-none z-20" />
 
