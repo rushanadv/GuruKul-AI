@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
 import { UnifiedLandingStory } from "@/components/sections/UnifiedLandingStory";
 import { InteriorRevealSection } from "@/components/sections/InteriorRevealSection";
+import { KnowledgeOrbitCard } from "@/components/KnowledgeOrbitCard";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { RevealSection } from "@/components/sections/RevealSection";
 import { Cta3DSection } from "@/components/sections/Cta3DSection";
@@ -24,6 +25,9 @@ export default function Home() {
 
       {/* 3. Product Interface Reveal */}
       <InteriorRevealSection />
+
+      {/* 3.5 Premium Interactive Feature Showcase: Knowledge Orbit */}
+      <KnowledgeOrbitCard />
 
       {/* 4. Protocol Overview (How The Constellation Operates) */}
       <ProcessSection />
