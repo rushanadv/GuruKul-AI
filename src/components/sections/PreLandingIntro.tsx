@@ -3,12 +3,13 @@
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 import { WarpDriveShader } from "@/components/ui/warp-drive-shader";
+import { HeroCinematicSequence } from "./HeroCinematicSequence";
 
 export const PreLandingIntro: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Bind scroll progress across 200vh pinned intro section
+  // Bind scroll progress across 250vh pinned transition container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -20,36 +21,40 @@ export const PreLandingIntro: React.FC = () => {
     restDelta: 0.001,
   });
 
-  // Pause WebGL shader rendering when user scrolls past 98% of intro to conserve GPU resources
+  // Pause WebGL shader rendering when transition reaches 98% to conserve GPU resources
   useMotionValueEvent(smoothProgress, "change", (latest) => {
-    if (latest > 0.98 && !isPaused) {
+    if (latest >= 0.98 && !isPaused) {
       setIsPaused(true);
-    } else if (latest <= 0.98 && isPaused) {
+    } else if (latest < 0.98 && isPaused) {
       setIsPaused(false);
     }
   });
 
   // --- WebGL Shader Uniform Parameters derived from Scroll Progress ---
-  const warpSpeed = useTransform(smoothProgress, [0, 0.35, 0.65, 0.9, 1.0], [1.0, 2.4, 5.5, 12.0, 0.0]);
-  const warpIntensity = useTransform(smoothProgress, [0, 0.35, 0.65, 0.9, 1.0], [1.0, 1.8, 3.2, 5.0, 0.0]);
-  const radialBrightness = useTransform(smoothProgress, [0, 0.5, 0.8, 0.95, 1.0], [1.0, 1.4, 3.0, 5.0, 0.0]);
-  const collapseProgress = useTransform(smoothProgress, [0.82, 0.98, 1.0], [0.0, 0.95, 1.0]);
+  const warpSpeed = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 4.5, 10.0, 0.0]);
+  const warpIntensity = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 3.2, 5.5, 0.0]);
+  const radialBrightness = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 2.5, 5.0, 0.0]);
 
-  // --- Center Overlay Text Animations ---
-  const textOpacity = useTransform(smoothProgress, [0, 0.3, 0.6, 0.82], [1, 1, 0.9, 0]);
-  const textScale = useTransform(smoothProgress, [0, 0.6, 0.9], [1.0, 1.08, 1.25]);
-  const textY = useTransform(smoothProgress, [0, 0.82], [0, -40]);
+  // Tunnel Canvas Opacity (Hidden during full white frame at 0.82)
+  const tunnelOpacity = useTransform(smoothProgress, [0, 0.78, 0.82, 1.0], [1.0, 1.0, 0.0, 0.0]);
 
-  // --- Container Singularity Zoom / Collapse into Landing Hero ---
-  const introContainerScale = useTransform(smoothProgress, [0.88, 0.99, 1.0], [1.0, 1.15, 0]);
-  const introContainerOpacity = useTransform(smoothProgress, [0.9, 0.995, 1.0], [1.0, 0.8, 0]);
+  // --- Center Intro Typography Animations ---
+  const textOpacity = useTransform(smoothProgress, [0, 0.35, 0.58], [1.0, 1.0, 0.0]);
+  const textScale = useTransform(smoothProgress, [0, 0.35, 0.58], [1.0, 1.0, 0.96]);
 
-  // Read current values for shader component
+  // --- Spatial Radial White Flash Expansion Overlay (0.60 -> 0.86) ---
+  const whiteFlashScale = useTransform(smoothProgress, [0.6, 0.78, 1.0], [0.05, 12.0, 12.0]);
+  const whiteFlashOpacity = useTransform(smoothProgress, [0.6, 0.78, 0.86, 0.98], [0.0, 1.0, 1.0, 0.0]);
+
+  // --- Landing Hero Scene Reveal (Mounted Underneath at Progress >= 0.82) ---
+  const heroOpacity = useTransform(smoothProgress, [0.78, 0.83, 1.0], [0.0, 1.0, 1.0]);
+  const heroScale = useTransform(smoothProgress, [0.84, 0.98], [1.015, 1.0]);
+
+  // Active state props for shader
   const [shaderProps, setShaderProps] = useState({
     speed: 1.0,
     intensity: 1.0,
     brightness: 1.0,
-    collapse: 0.0,
   });
 
   useMotionValueEvent(smoothProgress, "change", () => {
@@ -57,48 +62,44 @@ export const PreLandingIntro: React.FC = () => {
       speed: warpSpeed.get(),
       intensity: warpIntensity.get(),
       brightness: radialBrightness.get(),
-      collapse: collapseProgress.get(),
     });
   });
 
   return (
-    <div ref={containerRef} className="relative w-full h-[200vh] bg-black">
-      {/* Sticky Fullscreen Pre-Landing Intro Viewport */}
-      <motion.div
-        style={{
-          scale: introContainerScale,
-          opacity: introContainerOpacity,
-        }}
-        className="sticky top-0 h-[100svh] w-full overflow-hidden bg-black z-40 flex items-center justify-center select-none"
-      >
-        {/* WebGL Warp Drive Shader Background */}
-        <div className="absolute inset-0 w-full h-full">
+    <div ref={containerRef} className="relative w-full h-[250vh] bg-[#040605]">
+      {/* Sticky Viewport pinned at top: 0 throughout the transition */}
+      <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-[#040605] z-30 select-none">
+        {/* Z-INDEX 10: EXISTING GURUKUL LANDING HERO (MOUNTED UNDERNEATH) */}
+        <motion.div
+          style={{
+            opacity: heroOpacity,
+            scale: heroScale,
+          }}
+          className="absolute inset-0 w-full h-full z-10"
+        >
+          <HeroCinematicSequence />
+        </motion.div>
+
+        {/* Z-INDEX 20: WARP DRIVE WEBGL SHADER CANVAS */}
+        <motion.div
+          style={{ opacity: tunnelOpacity }}
+          className="absolute inset-0 w-full h-full z-20 pointer-events-none"
+        >
           <WarpDriveShader
             warpSpeed={shaderProps.speed}
             warpIntensity={shaderProps.intensity}
             radialBrightness={shaderProps.brightness}
-            collapseProgress={shaderProps.collapse}
             paused={isPaused}
           />
-        </div>
+        </motion.div>
 
-        {/* Subtle Radial Ambient Center Flare Overlay */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(53, 245, 180, 0.18) 0%, rgba(88, 216, 255, 0.05) 55%, transparent 80%)",
-          }}
-        />
-
-        {/* Minimal Center Intro Typography */}
+        {/* Z-INDEX 30: PRE-LANDING INTRO TYPOGRAPHY */}
         <motion.div
           style={{
             opacity: textOpacity,
             scale: textScale,
-            y: textY,
           }}
-          className="relative z-10 flex flex-col items-center justify-center text-center px-6 max-w-3xl space-y-6 pointer-events-none"
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto space-y-6 pointer-events-none"
         >
           {/* Small Monospace Eyebrow Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#35F5B4]/10 border border-[#35F5B4]/25 backdrop-blur-md">
@@ -129,7 +130,32 @@ export const PreLandingIntro: React.FC = () => {
             </span>
           </div>
         </motion.div>
-      </motion.div>
+
+        {/* Z-INDEX 40: SPATIAL RADIAL WHITE FLASH EXPANSION OVERLAY */}
+        <motion.div
+          style={{
+            opacity: whiteFlashOpacity,
+          }}
+          className="absolute inset-0 z-40 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden bg-white/20"
+        >
+          <motion.div
+            style={{
+              scale: whiteFlashScale,
+              background:
+                "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 25%, rgba(255,255,255,0) 70%)",
+            }}
+            className="w-[100vw] h-[100vh] rounded-full"
+          />
+
+          {/* SOLID WHITE COVER SHEET FOR 100% PURE WHITE FRAME DURING DOM SWAP */}
+          <motion.div
+            style={{
+              opacity: useTransform(smoothProgress, [0.77, 0.82, 0.86, 0.98], [0.0, 1.0, 1.0, 0.0]),
+            }}
+            className="absolute inset-0 bg-white"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 };

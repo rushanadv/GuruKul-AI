@@ -4,7 +4,6 @@ import React from "react";
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
 import { PreLandingIntro } from "@/components/sections/PreLandingIntro";
-import { Hero3DSection } from "@/components/sections/Hero3DSection";
 import { TimelineSection } from "@/components/sections/TimelineSection";
 import { InteriorRevealSection } from "@/components/sections/InteriorRevealSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
@@ -21,11 +20,8 @@ export default function Home() {
       {/* Background Deep Space Starfield */}
       <Starfield density={85} />
 
-      {/* 0. Cinematic Pre-Landing Warp Tunnel Intro */}
+      {/* 0. Cinematic Pre-Landing Warp Tunnel Intro & Landing Hero */}
       <PreLandingIntro />
-
-      {/* 1. Fullscreen Hero Section */}
-      <Hero3DSection />
 
       {/* 2. The Student Learning Arc • Milestone Scrubber */}
       <TimelineSection />
