@@ -6,13 +6,19 @@ import { Menu, X, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 export const Navbar: React.FC = () => {
+  const [visible, setVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      // Reveal navbar only as the pre-landing intro transitions into the hero (~1.2x viewport height)
+      const introThreshold = window.innerHeight * 1.2;
+      setVisible(window.scrollY > introThreshold);
+      setScrolled(window.scrollY > introThreshold + 150);
     };
+
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -25,11 +31,18 @@ export const Navbar: React.FC = () => {
 
   return (
     <motion.header
-      initial={{ y: -15, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      initial={false}
+      animate={{
+        y: visible ? 0 : -25,
+        opacity: visible ? 1 : 0,
+      }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 sm:px-12 py-5 ${
-        scrolled ? "bg-[#050706]/90 backdrop-blur-sm border-b border-[#39F5B5]/10" : "bg-transparent"
+        visible ? "pointer-events-auto" : "pointer-events-none"
+      } ${
+        scrolled
+          ? "bg-[#050706]/90 backdrop-blur-sm border-b border-[#39F5B5]/10"
+          : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -114,5 +127,3 @@ export const Navbar: React.FC = () => {
     </motion.header>
   );
 };
-
-
