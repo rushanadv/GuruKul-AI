@@ -3,13 +3,12 @@
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 import { WarpDriveShader } from "@/components/ui/warp-drive-shader";
-import { HeroCinematicSequence } from "./HeroCinematicSequence";
 
 export const PreLandingIntro: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Bind scroll progress across 250vh pinned transition container
+  // Bind scroll progress across 180vh pinned transition container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -21,7 +20,7 @@ export const PreLandingIntro: React.FC = () => {
     restDelta: 0.001,
   });
 
-  // Pause WebGL shader rendering when transition reaches 98% to conserve GPU resources
+  // Pause WebGL shader rendering when pre-landing scroll finishes to conserve GPU resources
   useMotionValueEvent(smoothProgress, "change", (latest) => {
     if (latest >= 0.98 && !isPaused) {
       setIsPaused(true);
@@ -31,24 +30,17 @@ export const PreLandingIntro: React.FC = () => {
   });
 
   // --- WebGL Shader Uniform Parameters derived from Scroll Progress ---
-  const warpSpeed = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 4.5, 10.0, 0.0]);
-  const warpIntensity = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 3.2, 5.5, 0.0]);
-  const radialBrightness = useTransform(smoothProgress, [0, 0.35, 0.6, 0.78, 1.0], [1.0, 1.0, 2.5, 5.0, 0.0]);
-
-  // Tunnel Canvas Opacity (Hidden during full white frame at 0.82)
-  const tunnelOpacity = useTransform(smoothProgress, [0, 0.78, 0.82, 1.0], [1.0, 1.0, 0.0, 0.0]);
+  const warpSpeed = useTransform(smoothProgress, [0, 0.35, 0.65, 0.85, 1.0], [1.0, 1.0, 4.8, 12.0, 0.0]);
+  const warpIntensity = useTransform(smoothProgress, [0, 0.35, 0.65, 0.85, 1.0], [1.0, 1.0, 3.2, 5.5, 0.0]);
+  const radialBrightness = useTransform(smoothProgress, [0, 0.35, 0.65, 0.85, 1.0], [1.0, 1.0, 2.5, 5.0, 0.0]);
 
   // --- Center Intro Typography Animations ---
-  const textOpacity = useTransform(smoothProgress, [0, 0.35, 0.58], [1.0, 1.0, 0.0]);
-  const textScale = useTransform(smoothProgress, [0, 0.35, 0.58], [1.0, 1.0, 0.96]);
+  const textOpacity = useTransform(smoothProgress, [0, 0.35, 0.6], [1.0, 1.0, 0.0]);
+  const textScale = useTransform(smoothProgress, [0, 0.35, 0.6], [1.0, 1.0, 0.95]);
 
-  // --- Spatial Radial White Flash Expansion Overlay (0.60 -> 0.86) ---
-  const whiteFlashScale = useTransform(smoothProgress, [0.6, 0.78, 1.0], [0.05, 12.0, 12.0]);
-  const whiteFlashOpacity = useTransform(smoothProgress, [0.6, 0.78, 0.86, 0.98], [0.0, 1.0, 1.0, 0.0]);
-
-  // --- Landing Hero Scene Reveal (Mounted Underneath at Progress >= 0.82) ---
-  const heroOpacity = useTransform(smoothProgress, [0.78, 0.83, 1.0], [0.0, 1.0, 1.0]);
-  const heroScale = useTransform(smoothProgress, [0.84, 0.98], [1.015, 1.0]);
+  // --- Spatial Radial White Flash Expansion Overlay (0.60 -> 0.85) ---
+  const whiteFlashScale = useTransform(smoothProgress, [0.6, 0.85, 1.0], [0.1, 16.0, 16.0]);
+  const whiteFlashOpacity = useTransform(smoothProgress, [0.6, 0.85, 1.0], [0.0, 1.0, 1.0]);
 
   // Active state props for shader
   const [shaderProps, setShaderProps] = useState({
@@ -66,32 +58,18 @@ export const PreLandingIntro: React.FC = () => {
   });
 
   return (
-    <div ref={containerRef} className="relative w-full h-[250vh] bg-[#040605]">
-      {/* Sticky Viewport pinned at top: 0 throughout the transition */}
+    <div ref={containerRef} className="relative w-full h-[180vh] bg-[#040605]">
+      {/* Sticky Viewport pinned at top: 0 throughout the pre-landing intro */}
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-[#040605] z-30 select-none">
-        {/* Z-INDEX 10: EXISTING GURUKUL LANDING HERO (MOUNTED UNDERNEATH) */}
-        <motion.div
-          style={{
-            opacity: heroOpacity,
-            scale: heroScale,
-          }}
-          className="absolute inset-0 w-full h-full z-10"
-        >
-          <HeroCinematicSequence />
-        </motion.div>
-
         {/* Z-INDEX 20: WARP DRIVE WEBGL SHADER CANVAS */}
-        <motion.div
-          style={{ opacity: tunnelOpacity }}
-          className="absolute inset-0 w-full h-full z-20 pointer-events-none"
-        >
+        <div className="absolute inset-0 w-full h-full z-20 pointer-events-none">
           <WarpDriveShader
             warpSpeed={shaderProps.speed}
             warpIntensity={shaderProps.intensity}
             radialBrightness={shaderProps.brightness}
             paused={isPaused}
           />
-        </motion.div>
+        </div>
 
         {/* Z-INDEX 30: PRE-LANDING INTRO TYPOGRAPHY */}
         <motion.div
@@ -147,10 +125,10 @@ export const PreLandingIntro: React.FC = () => {
             className="w-[100vw] h-[100vh] rounded-full"
           />
 
-          {/* SOLID WHITE COVER SHEET FOR 100% PURE WHITE FRAME DURING DOM SWAP */}
+          {/* SOLID WHITE COVER SHEET FOR 100% PURE WHITE FRAME AT END OF PRE-LANDING */}
           <motion.div
             style={{
-              opacity: useTransform(smoothProgress, [0.77, 0.82, 0.86, 0.98], [0.0, 1.0, 1.0, 0.0]),
+              opacity: useTransform(smoothProgress, [0.84, 0.88, 1.0], [0.0, 1.0, 1.0]),
             }}
             className="absolute inset-0 bg-white"
           />
