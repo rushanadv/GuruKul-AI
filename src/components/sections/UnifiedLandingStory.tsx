@@ -23,27 +23,33 @@ export const UnifiedLandingStory: React.FC = () => {
     restDelta: 0.001,
   });
 
-  // Pause WebGL WarpDriveShader after white flash handoff (progress >= 0.30) to conserve GPU
+  // Pause WebGL WarpDriveShader after white flash handoff (progress >= 0.32) to conserve GPU
   useMotionValueEvent(smoothProgress, "change", (latest) => {
-    if (latest >= 0.30 && !isShaderPaused) {
+    if (latest >= 0.32 && !isShaderPaused) {
       setIsShaderPaused(true);
-    } else if (latest < 0.30 && isShaderPaused) {
+    } else if (latest < 0.32 && isShaderPaused) {
       setIsShaderPaused(false);
     }
   });
 
-  // --- STAGE 1: WARP TUNNEL PRE-LANDING INTRO (0.00 -> 0.30) ---
-  const warpSpeed = useTransform(smoothProgress, [0, 0.14, 0.24, 0.30], [1.0, 1.0, 5.0, 12.0]);
-  const warpIntensity = useTransform(smoothProgress, [0, 0.14, 0.24, 0.30], [1.0, 1.0, 3.2, 5.5]);
-  const radialBrightness = useTransform(smoothProgress, [0, 0.14, 0.24, 0.30], [1.0, 1.0, 2.5, 5.0]);
+  // =========================================================================
+  // SCENE 1: WARP TUNNEL PRE-LANDING INTRO (Progress 0.00 -> 0.35)
+  // =========================================================================
+  const warpSpeed = useTransform(smoothProgress, [0, 0.15, 0.26, 0.32], [1.0, 1.2, 6.0, 14.0]);
+  const warpIntensity = useTransform(smoothProgress, [0, 0.15, 0.26, 0.32], [1.0, 1.2, 3.5, 6.0]);
+  const radialBrightness = useTransform(smoothProgress, [0, 0.15, 0.26, 0.32], [1.0, 1.2, 3.0, 6.0]);
 
-  const preLandingTextOpacity = useTransform(smoothProgress, [0, 0.14, 0.24], [1.0, 1.0, 0.0]);
-  const preLandingTextScale = useTransform(smoothProgress, [0, 0.14, 0.24], [1.0, 1.0, 0.95]);
-  const tunnelOpacity = useTransform(smoothProgress, [0, 0.24, 0.28], [1.0, 1.0, 0.0]);
+  const preLandingTextOpacity = useTransform(smoothProgress, [0, 0.14, 0.25], [1.0, 1.0, 0.0]);
+  const preLandingTextScale = useTransform(smoothProgress, [0, 0.14, 0.25], [1.0, 1.0, 0.95]);
+  const tunnelOpacity = useTransform(smoothProgress, [0, 0.26, 0.32], [1.0, 1.0, 0.0]);
 
-  // Spatial Radial White Flash Expansion Overlay (0.14 -> 0.38)
-  const whiteFlashScale = useTransform(smoothProgress, [0.14, 0.26, 0.36], [0.1, 16.0, 16.0]);
-  const whiteFlashOpacity = useTransform(smoothProgress, [0.14, 0.24, 0.30, 0.36], [0.0, 0.95, 1.0, 0.0]);
+  // Layer A: Radial White Flash Expansion (0.16 -> 0.35)
+  const radialFlashScale = useTransform(smoothProgress, [0.16, 0.28, 0.35], [0.1, 18.0, 18.0]);
+  const radialFlashOpacity = useTransform(smoothProgress, [0.16, 0.26, 0.32, 0.38], [0.0, 0.95, 1.0, 0.0]);
+
+  // Layer B: Solid Fullscreen White Flash Cover (0.24 -> 0.42)
+  // FULL WHITE HOLD at 0.30 -> 0.35 guaranteeing ZERO black pixel exposure
+  const solidWhiteOpacity = useTransform(smoothProgress, [0.22, 0.30, 0.35, 0.42], [0.0, 1.0, 1.0, 0.0]);
 
   // Active state props for WebGL shader
   const [shaderProps, setShaderProps] = useState({
@@ -60,47 +66,62 @@ export const UnifiedLandingStory: React.FC = () => {
     });
   });
 
-  // --- STAGE 2: MAIN HERO SCENE (0.30 -> 0.58) ---
-  const heroOpacity = useTransform(smoothProgress, [0.26, 0.30, 0.52, 0.60], [0.0, 1.0, 1.0, 0.0]);
-  const heroY = useTransform(smoothProgress, [0.52, 0.60], [0, -40]);
+  // =========================================================================
+  // SCENE 2: MAIN HERO SCENE (Progress 0.32 -> 0.62)
+  // Scene 2 is ALREADY positioned underneath solid white, revealed as white clears
+  // =========================================================================
+  const heroOpacity = useTransform(smoothProgress, [0.28, 0.34, 0.52, 0.62], [0.0, 1.0, 1.0, 0.0]);
+  const heroY = useTransform(smoothProgress, [0.52, 0.62], [0, -35]);
 
-  // --- KNOWLEDGE GRAPH & BACKDROP MESH ANIMATIONS ---
-  const graphX = useTransform(smoothProgress, [0.30, 0.45, 0.58, 0.92], ["22%", "22%", "0%", "0%"]);
-  const graphScale = useTransform(smoothProgress, [0.30, 0.55, 0.75, 0.92], [1.0, 1.18, 1.45, 1.0]);
-  const graphRotateZ = useTransform(smoothProgress, [0.30, 0.55], [0, -3.5]);
+  // Central Knowledge Graph transforms
+  const graphX = useTransform(smoothProgress, [0.32, 0.48, 0.62, 0.95], ["22%", "22%", "0%", "0%"]);
+  const graphScale = useTransform(smoothProgress, [0.32, 0.55, 0.75, 0.95], [1.0, 1.15, 1.4, 1.0]);
+  const graphRotateZ = useTransform(smoothProgress, [0.32, 0.58], [0, -3.0]);
 
-  // --- STAGE 3: STUDENT LEARNING ARC MILESTONES (0.58 -> 1.00) ---
-  // Week 01 • Inert Document Phase (0.58 -> 0.68)
-  const week1Opacity = useTransform(smoothProgress, [0.56, 0.60, 0.66, 0.70], [0, 1, 1, 0]);
-  const week1Y = useTransform(smoothProgress, [0.56, 0.70], [30, -30]);
+  // =========================================================================
+  // SCENE 3: STUDENT LEARNING ARC MILESTONES (Progress 0.58 -> 1.00)
+  // Overlapping opacity ranges to enforce NO DEAD FRAME RULE
+  // =========================================================================
+  // Week 01 • Inert Document Phase (0.56 -> 0.72)
+  const week1Opacity = useTransform(smoothProgress, [0.56, 0.62, 0.68, 0.73], [0, 1, 1, 0]);
+  const week1Y = useTransform(smoothProgress, [0.56, 0.73], [25, -25]);
 
-  // Week 03 • Question Trace Signal (0.68 -> 0.80)
-  const week3Opacity = useTransform(smoothProgress, [0.68, 0.72, 0.78, 0.82], [0, 1, 1, 0]);
-  const week3Y = useTransform(smoothProgress, [0.68, 0.82], [30, -30]);
+  // Week 03 • Question Trace Signal (0.69 -> 0.83)
+  const week3Opacity = useTransform(smoothProgress, [0.69, 0.74, 0.79, 0.84], [0, 1, 1, 0]);
+  const week3Y = useTransform(smoothProgress, [0.69, 0.84], [25, -25]);
 
-  // Week 06 • Progress Illumination (0.80 -> 0.90)
-  const week6Opacity = useTransform(smoothProgress, [0.80, 0.84, 0.88, 0.92], [0, 1, 1, 0]);
-  const week6Y = useTransform(smoothProgress, [0.80, 0.92], [30, -30]);
+  // Week 06 • Progress Illumination (0.80 -> 0.93)
+  const week6Opacity = useTransform(smoothProgress, [0.80, 0.85, 0.89, 0.94], [0, 1, 1, 0]);
+  const week6Y = useTransform(smoothProgress, [0.80, 0.94], [25, -25]);
 
   // Week 12 • Visible Mastery & Final Synthesis (0.90 -> 1.00)
-  const week12Opacity = useTransform(smoothProgress, [0.90, 0.95], [0, 1]);
-  const week12Y = useTransform(smoothProgress, [0.90, 0.95], [40, 0]);
+  const week12Opacity = useTransform(smoothProgress, [0.90, 0.95, 1.0], [0, 1, 1]);
+  const week12Y = useTransform(smoothProgress, [0.90, 0.95], [30, 0]);
 
-  // Nav opacity fade during initial hero scroll
-  const navOpacity = useTransform(smoothProgress, [0.30, 0.52], [1, 0.45]);
+  // Dynamic pointer-events state helpers
+  const isHeroActive = useTransform(smoothProgress, (val) => val >= 0.32 && val <= 0.58);
+  const isWeek12Active = useTransform(smoothProgress, (val) => val >= 0.90);
+
+  const [heroPointerEvents, setHeroPointerEvents] = useState<"auto" | "none">("none");
+  const [week12PointerEvents, setWeek12PointerEvents] = useState<"auto" | "none">("none");
+
+  useMotionValueEvent(smoothProgress, "change", () => {
+    setHeroPointerEvents(isHeroActive.get() ? "auto" : "none");
+    setWeek12PointerEvents(isWeek12Active.get() ? "auto" : "none");
+  });
 
   return (
     <div ref={containerRef} className="relative w-full h-[500vh] bg-[#040605]">
-      {/* STICKY FULLSCREEN VIEWPORT STAGE — FIXED AT TOP: 0 THROUGHOUT THE 500VH TRACK */}
+      {/* 
+        STICKY FULLSCREEN VIEWPORT STAGE — FIXED AT TOP: 0 FOR THE ENTIRE 500VH TRACK
+        The viewport stage NEVER moves vertically; internal layers transform/crossfade.
+      */}
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-[#040605] z-30 select-none flex items-center justify-center">
         {/* LAYER 0: CONSTELLATION GRID INTERACTIVE MESH BACKDROP */}
         <ConstellationGrid scrollProgress={smoothProgress} className="z-0" />
 
-        {/* Ambient Top Glow Line */}
+        {/* Ambient Top Accent Line */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#35F5B4]/25 to-transparent pointer-events-none z-5" />
-
-        {/* Ambient Nav Fade Overlay */}
-        <motion.div style={{ opacity: navOpacity }} className="pointer-events-none" />
 
         {/* LAYER 10: CENTRAL INTERACTIVE KNOWLEDGE CONSTELLATION GRAPH */}
         <motion.div
@@ -114,7 +135,7 @@ export const UnifiedLandingStory: React.FC = () => {
           <InteractiveCinematicGraph scrollProgress={smoothProgress} />
         </motion.div>
 
-        {/* LAYER 20: WARP DRIVE WEBGL SHADER CANVAS (PRE-LANDING STAGE 1) */}
+        {/* LAYER 20: WARP DRIVE WEBGL SHADER CANVAS (SCENE 1 BACKDROP) */}
         <motion.div
           style={{ opacity: tunnelOpacity }}
           className="absolute inset-0 w-full h-full z-20 pointer-events-none"
@@ -127,7 +148,7 @@ export const UnifiedLandingStory: React.FC = () => {
           />
         </motion.div>
 
-        {/* LAYER 30: PRE-LANDING INTRO TYPOGRAPHY */}
+        {/* LAYER 30: SCENE 1 PRE-LANDING INTRO TYPOGRAPHY */}
         <motion.div
           style={{
             opacity: preLandingTextOpacity,
@@ -161,32 +182,41 @@ export const UnifiedLandingStory: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* LAYER 40: SPATIAL RADIAL WHITE FLASH EXPANSION OVERLAY */}
+        {/* LAYER 40: RADIAL WHITE FLASH BLOOM OVERLAY */}
         <motion.div
           style={{
-            opacity: whiteFlashOpacity,
+            opacity: radialFlashOpacity,
           }}
           className="absolute inset-0 z-40 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden"
         >
           <motion.div
             style={{
-              scale: whiteFlashScale,
+              scale: radialFlashScale,
               background:
-                "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.92) 30%, rgba(53,245,180,0.4) 60%, transparent 80%)",
+                "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 35%, rgba(53,245,180,0.5) 65%, transparent 85%)",
             }}
             className="w-[100vw] h-[100vh] rounded-full"
           />
         </motion.div>
 
-        {/* LAYER 50: STAGE 2 MAIN HERO COPY OVERLAY */}
+        {/* LAYER 45: SOLID FULLSCREEN WHITE FLASH COVER (Guarantees 100% Full-Bleed White Hold) */}
+        <motion.div
+          style={{
+            opacity: solidWhiteOpacity,
+          }}
+          className="absolute inset-0 z-45 w-full h-full pointer-events-none bg-white"
+        />
+
+        {/* LAYER 50: SCENE 2 MAIN HERO COPY OVERLAY */}
         <motion.div
           style={{
             opacity: heroOpacity,
             y: heroY,
+            pointerEvents: heroPointerEvents,
           }}
-          className="relative z-50 w-full max-w-7xl px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 items-center pointer-events-none"
+          className="relative z-50 w-full max-w-7xl px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 items-center"
         >
-          <div className="md:col-span-6 space-y-7 pointer-events-auto">
+          <div className="md:col-span-6 space-y-7">
             <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-[#35F5B4]/10 border border-[#35F5B4]/20 backdrop-blur-md">
               <span className="w-1.5 h-1.5 rounded-full bg-[#35F5B4] animate-pulse" />
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#35F5B4] font-medium">
@@ -227,13 +257,13 @@ export const UnifiedLandingStory: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* LAYER 50: STAGE 3 • WEEK 01 SCENE OVERLAY */}
+        {/* LAYER 55: SCENE 3 • WEEK 01 OVERLAY */}
         <motion.div
           style={{
             opacity: week1Opacity,
             y: week1Y,
           }}
-          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-50 max-w-md space-y-4 pointer-events-none"
+          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-55 max-w-md space-y-4 pointer-events-none"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3F6F4]/10 border border-[#F3F6F4]/20 backdrop-blur-md">
             <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#F3F6F4]">
@@ -251,13 +281,13 @@ export const UnifiedLandingStory: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* LAYER 50: STAGE 3 • WEEK 03 QUESTION TRACE SCENE OVERLAY */}
+        {/* LAYER 55: SCENE 3 • WEEK 03 QUESTION TRACE OVERLAY */}
         <motion.div
           style={{
             opacity: week3Opacity,
             y: week3Y,
           }}
-          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-50 max-w-lg space-y-5 pointer-events-none"
+          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-55 max-w-lg space-y-5 pointer-events-none"
         >
           <div className="p-4 md:p-5 rounded-2xl bg-[#040605]/85 border border-[#35F5B4]/30 backdrop-blur-xl space-y-2 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
             <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#35F5B4]">
@@ -278,13 +308,13 @@ export const UnifiedLandingStory: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* LAYER 50: STAGE 3 • WEEK 06 PROGRESS ILLUMINATION SCENE OVERLAY */}
+        {/* LAYER 55: SCENE 3 • WEEK 06 PROGRESS ILLUMINATION OVERLAY */}
         <motion.div
           style={{
             opacity: week6Opacity,
             y: week6Y,
           }}
-          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-50 max-w-md space-y-4 pointer-events-none"
+          className="absolute left-8 md:left-20 top-1/2 -translate-y-1/2 z-55 max-w-md space-y-4 pointer-events-none"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35F5B4]/10 border border-[#35F5B4]/20 backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-[#35F5B4]" />
@@ -303,13 +333,14 @@ export const UnifiedLandingStory: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* LAYER 50: STAGE 3 • WEEK 12 SYNTHESIS & FINAL CTA OVERLAY */}
+        {/* LAYER 55: SCENE 3 • WEEK 12 SYNTHESIS & FINAL CTA OVERLAY */}
         <motion.div
           style={{
             opacity: week12Opacity,
             y: week12Y,
+            pointerEvents: week12PointerEvents,
           }}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-6 pointer-events-auto bg-gradient-to-t from-[#040605] via-transparent to-[#040605]/80"
+          className="absolute inset-0 z-55 flex flex-col items-center justify-center text-center px-6 bg-gradient-to-t from-[#040605] via-transparent to-[#040605]/80"
         >
           <div className="max-w-2xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#35F5B4]/10 border border-[#35F5B4]/20 backdrop-blur-md">
