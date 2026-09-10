@@ -6,6 +6,7 @@ import { Starfield } from "@/components/Starfield";
 import { UnifiedLandingStory } from "@/components/sections/UnifiedLandingStory";
 import { InteriorRevealSection } from "@/components/sections/InteriorRevealSection";
 import { KnowledgeOrbitCard } from "@/components/KnowledgeOrbitCard";
+import { GlobalVisionSection } from "@/components/sections/GlobalVisionSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { RevealSection } from "@/components/sections/RevealSection";
 import { Cta3DSection } from "@/components/sections/Cta3DSection";
@@ -28,6 +29,9 @@ export default function Home() {
 
       {/* 3.5 Premium Interactive Feature Showcase: Knowledge Orbit */}
       <KnowledgeOrbitCard />
+
+      {/* 3.8 Mid-Page Visual Story: Beyond One Syllabus (Wireframe Dotted Globe) */}
+      <GlobalVisionSection />
 
       {/* 4. Protocol Overview (How The Constellation Operates) */}
       <ProcessSection />
